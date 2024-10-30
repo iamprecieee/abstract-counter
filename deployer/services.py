@@ -106,7 +106,7 @@ class CounterDeploymentService:
             
             contract_data_value = (
                 '0x9c4d535b0000000000000000000000000000000000000000000000000000000000000000'  # is_system flag
-                f'{data['hash']}'  # factory dependency hash from compiler
+                f'{data["hash"]}'  # factory dependency hash from compiler
                 '00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000'  # calldata length
             )
             return {'contract_data_value': contract_data_value}
