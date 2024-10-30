@@ -2,6 +2,9 @@ from django.conf import settings
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import json
+from django.core.cache import cache
+import hashlib
+import os
 
 
 class CounterDeploymentService:
@@ -10,7 +13,28 @@ class CounterDeploymentService:
         self.src_dir = None
         self.out_path = None
         self.contract_path = None
-        self.executor = ThreadPoolExecutor(max_workers=3)
+        self.executor = ThreadPoolExecutor(max_workers=2)
+        self.cache_dir = settings.BASE_DIR / 'contract_cache'
+        self.cache_dir.mkdir(exist_ok=True)
+        
+    def _get_cache_key(self):
+        contract_content = self._get_contract_content()
+        return f'counter_contract_{hashlib.md5(contract_content.encode()).hexdigest()}'
+    
+    def _get_contract_content(self):
+        return (
+            '// SPDX-License-Identifier: MIT\n'
+            'pragma solidity ^0.8.24;\n\n'
+            'contract Counter {\n'
+            '\tuint256 public number;\n'
+            '\tfunction setNumber(uint256 newNumber) public {\n'
+            '\t\tnumber = newNumber;\n'
+            '\t}\n\n'
+            '\tfunction increment() public {\n'
+            '\t\tnumber++;\n'
+            '\t}\n'
+            '}'
+        )
         
     async def _async_subprocess(self, cmd, cwd=None, timeout=300):
         """Run subprocess command asynchronously with timeout"""
@@ -38,6 +62,8 @@ class CounterDeploymentService:
         """Create toml file and src directory"""
         try:
             foundry_toml_path = self.base_dir / 'foundry.toml'
+            if foundry_toml_path.exists():
+                return
             with open(foundry_toml_path, 'w') as file:
                 file.write(
                     '[profile.default]\n' +
@@ -113,12 +139,31 @@ class CounterDeploymentService:
         except Exception as e:
             raise Exception(f'Contract data error: {e}')
         
+    def _save_contract_data(self, contract_data):
+        cache_key = self._get_cache_key()
+        cache.set(cache_key, contract_data, timeout=720000)
+        
+    def _get_cached_contract_data(self):
+        cache_key = self._get_cache_key()
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return cached_data
+        return None
+        
     async def prepare_deployment(self):
         try:
+            cached_data = self._get_cached_contract_data()
+            if cached_data:
+                return {
+                    'success': True,
+                    'contract_data': cached_data
+                }
+                
             self._setup_project()
             self._create_contract_file()
             await self._compile_contract()
             contract_data = self._get_contract_data()
+            self._save_contract_data(contract_data)
             return {
                 'success': True,
                 'contract_data': contract_data

@@ -46,6 +46,7 @@ test/
 src/
 script/
 lib/
+contract_cache/
 
 # IDE
 .idea/

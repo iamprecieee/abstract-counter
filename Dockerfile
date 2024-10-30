@@ -1,5 +1,9 @@
 FROM python:3.9
 
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV RUST_MIN_STACK=4194304
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
@@ -34,7 +38,9 @@ RUN forge build --help | grep -A 20 "ZKSync configuration:"
 # Set up Django app
 WORKDIR /app
 COPY requirements.txt .
+RUN python -m pip install --no-cache-dir --upgrade pip
 RUN pip install -r requirements.txt
+RUN python -m pip install --no-cache-dir pylibmc
 
 # Copy application
 COPY . .
