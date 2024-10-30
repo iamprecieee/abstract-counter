@@ -51,11 +51,29 @@ class CounterDeployer {
 
             const provider = new ethers.BrowserProvider(window.ethereum);
             const accounts = await provider.send('eth_requestAccounts', []);
-            
-            await window.ethereum.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x2B74' }], // 11124 in hex
-            });
+
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x2B74' }], // 11124 in hex
+                });
+            } catch (err) {
+                // Adds chain if non-existent
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0x2B74',
+                        chainName: 'Abstract Testnet',
+                        rpcUrls: ['https://api.testnet.abs.xyz'],
+                        nativeCurrency: {
+                            name: 'Ethereum',
+                            symbol: 'ETH',
+                            decimals: 18,
+                        },
+                        blockExplorerUrls: ['https://explorer.testnet.abs.xyz']
+                    }],
+                });
+            };
 
             const network = await provider.getNetwork();
             if (network.chainId !== 11124n) {
@@ -71,7 +89,11 @@ class CounterDeployer {
                 `Connected: ${this.address.slice(0, 6)}...${this.address.slice(-4)}`;
 
         } catch (err) {
-            this.showError(err.message);
+            if (typeof err.message === 'string' && err.message.includes("user rejected")) {
+                this.showError('User rejected the request.');
+            } else {
+                this.showError(err.message || 'Connection failed');
+            }  
         }
     }
 
@@ -131,7 +153,11 @@ class CounterDeployer {
             this.showSuccess(`CONTRACT ADDRESS: ${receipt.contractAddress}`);
 
         } catch (err) {
-            this.showError(err.message || 'Deployment failed');
+            if (typeof err.message === 'string' && err.message.includes("user rejected")) {
+                this.showError('User rejected the request.');
+            } else {
+                this.showError(err.message || 'Deployment failed');
+            }  
         }
     }
 
