@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .services import CounterDeploymentService
 from asgiref.sync import async_to_sync
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework.exceptions import Throttled
 
 
 class HomeView(APIView):
@@ -14,6 +16,8 @@ class HomeView(APIView):
     
     
 class PrepareDeploymentView(APIView):
+    throttle_classes = [AnonRateThrottle]
+    
     """API endpoint to prepare contract deployment"""
     
     @staticmethod
@@ -33,6 +37,8 @@ class PrepareDeploymentView(APIView):
           
             
 class VerifyContractView(APIView):
+    throttle_classes = [AnonRateThrottle]
+    
     """API endpoint to verify deployed contract"""
     
     @staticmethod

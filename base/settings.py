@@ -145,3 +145,12 @@ CACHES = {
         'LOCATION': BASE_DIR / 'contract_cache',
     }
 }
+
+REST_FRAMEWORK = {
+    "REST_FRAMEWORK_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/min",
+    },
+}

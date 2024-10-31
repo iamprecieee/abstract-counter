@@ -112,6 +112,10 @@ class CounterDeployer {
 
             const data = await response.json();
 
+            if (response.status === 429) {
+                throw new Error('Rate limit exceeded. Wait a few seconds.' );
+            }
+
             if (!data.success) {
                 throw new Error(data.error || 'Failed to prepare deployment');
             }
@@ -163,7 +167,7 @@ class CounterDeployer {
 
     showError(message) {
         const statusEl = document.getElementById('status-message');
-        statusEl.innerHTML = `<div class="p-2 text-center text-red-600 text-sm bg-red-50 font-bold rounded">Error: ${message}</div>`;
+        statusEl.innerHTML = `<div class="p-2 text-center text-red-600 text-sm bg-red-50 font-bold rounded">${message}</div>`;
     }
 
     showSuccess(message) {
