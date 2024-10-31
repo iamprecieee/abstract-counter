@@ -41,7 +41,7 @@ out/
 foundry.toml
 broadcast/
 .gitmodules
-# README.md 
+README.md 
 test/
 src/
 script/
