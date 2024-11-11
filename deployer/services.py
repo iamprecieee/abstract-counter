@@ -16,7 +16,6 @@ class CounterDeploymentService:
         self.cache_dir = settings.BASE_DIR / 'contract_cache'
         self.cache_dir.mkdir(exist_ok=True)
         self.contract_content = ('// SPDX-License-Identifier: MIT\n'
-            '// https://github.com/iamprecieee/abstract-counter\n'
             'pragma solidity ^0.8.24;\n\n'
             'contract Counter {\n'
             '\tuint256 public number;\n'
