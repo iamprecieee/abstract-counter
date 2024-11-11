@@ -69,6 +69,8 @@ class CounterDeploymentService:
     def _setup_project(self):
         """Create toml file and src directory"""
         try:
+            self.src_dir = self.base_dir / 'src'
+            self.src_dir.mkdir(exist_ok=True)
             foundry_toml_path = self.base_dir / 'foundry.toml'
             if foundry_toml_path.exists():
                 return
@@ -81,9 +83,6 @@ class CounterDeploymentService:
                     'is_system = false\n' +
                     'mode = "3"'
                 )
-                
-            self.src_dir = self.base_dir / 'src'
-            self.src_dir.mkdir(exist_ok=True)
         except Exception as e:
             raise Exception(f'Project setup failed: {e}')
     
@@ -104,13 +103,11 @@ class CounterDeploymentService:
                 cwd=self.base_dir,
                 timeout=60
             )
-            
             await self._async_subprocess(
                 ['forge', 'init', '--force', '--no-git', '--no-commit', '.'],
                 cwd=self.base_dir,
                 timeout=60
             )
-            
             self.out_path = self.base_dir / 'zkout' / 'Counter.sol' / 'Counter.json'
             if not self.out_path.exists():
                 await self._async_subprocess(
