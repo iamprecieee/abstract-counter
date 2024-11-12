@@ -90,7 +90,7 @@ class CounterDeploymentService:
                     '[profile.zksync]\n' +
                     'zksolc_version = "1.5.4"\n' +
                     'is_system = false\n' +
-                    'mode = "3"\n' +
+                    'mode = "3"'
                 )
         except Exception as e:
             raise Exception(f'Project setup failed: {e}')
