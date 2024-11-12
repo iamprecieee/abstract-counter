@@ -3,12 +3,17 @@ FROM python:3.9
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV RUST_MIN_STACK=4194304
+ENV FOUNDRY_PROFILE=zksync
+ENV FOUNDRY_DEBUG=1
+ENV PATH="/root/.cargo/bin:/root/.foundry/bin:/root/.foundry-zksync/bin:/root/.zksolc/bin:${PATH}"
+
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     build-essential \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Rust (required for foundry)
@@ -23,7 +28,8 @@ RUN curl -L https://foundry.paradigm.xyz | bash && \
 RUN mkdir -p /root/.zksolc/bin && \
     wget https://github.com/matter-labs/zksolc-bin/raw/main/linux-amd64/zksolc-linux-amd64-musl-v1.5.4 -O /root/.zksolc/bin/zksolc && \
     chmod +x /root/.zksolc/bin/zksolc && \
-    /bin/bash -c "source /root/.bashrc"
+    echo 'export PATH="/root/.zksolc/bin:$PATH"' >> /root/.bashrc && \
+    ln -s /root/.zksolc/bin/zksolc /usr/local/bin/zksolc
 
 # Install foundry-zksync
 RUN curl -L https://raw.githubusercontent.com/matter-labs/foundry-zksync/main/foundryup-zksync/install | bash && \
@@ -31,8 +37,8 @@ RUN curl -L https://raw.githubusercontent.com/matter-labs/foundry-zksync/main/fo
     /bin/bash -c "source /root/.bashrc && foundryup-zksync"
 
 # Verify installations
-RUN zksolc --version
-RUN forge --version
+RUN /bin/bash -c "source /root/.bashrc && zksolc --version"
+RUN /bin/bash -c "source /root/.bashrc && forge --version"
 RUN forge build --help | grep -A 20 "ZKSync configuration:"
 
 ENV FOUNDRY_PROFILE=zksync
