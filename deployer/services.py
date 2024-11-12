@@ -79,9 +79,18 @@ class CounterDeploymentService:
                     '[profile.default]\n' +
                     "src = 'src'\n" +
                     "libs = ['lib']\n" +
+                    "out = 'out'\n" +
+                    'solc = "0.8.24"\n' +
+                    'optimizer = true\n' +
+                    'optimizer_runs = 200\n' +
                     'fallback_oz = true\n' +
                     'is_system = false\n' +
                     'mode = "3"'
+
+                    '[profile.zksync]\n' +
+                    'zksolc_version = "1.5.4"\n' +
+                    'is_system = false\n' +
+                    'mode = "3"\n' +
                 )
         except Exception as e:
             raise Exception(f'Project setup failed: {e}')
