@@ -59,9 +59,6 @@ ENV PORT=8000
 
 # Start script
 RUN echo '#!/bin/bash \
-if [ -f .env ]; then \
-    export $(cat .env | xargs) \
-fi \
 python manage.py migrate \
 python manage.py collectstatic --noinput \
 gunicorn base.asgi:application -b 0.0.0.0:$PORT -c gunicorn.conf.py' > /app/start.sh && \

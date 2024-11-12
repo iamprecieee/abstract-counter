@@ -85,8 +85,7 @@ class CounterDeploymentService:
                     'optimizer_runs = 200\n' +
                     'fallback_oz = true\n' +
                     'is_system = false\n' +
-                    'mode = "3"'
-
+                    'mode = "3"\n\n' +
                     '[profile.zksync]\n' +
                     'zksolc_version = "1.5.4"\n' +
                     'is_system = false\n' +
