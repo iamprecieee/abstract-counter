@@ -124,6 +124,8 @@ class CounterDeployer {
                 throw new Error('Invalid contract data received from server');
             }
 
+            console.log(ethers);
+
             // Create transaction
             const tx = {
                 from: await signer.getAddress(),
@@ -131,6 +133,7 @@ class CounterDeployer {
                 data: data.contract_data.contract_data_value,
                 nonce: await provider.getTransactionCount(await signer.getAddress(), "latest"),
                 chainId: 11124,
+                gasLimit: 3000000,
             };
 
             const response2 = await signer.sendTransaction(tx);
@@ -157,6 +160,7 @@ class CounterDeployer {
             this.showSuccess(`CONTRACT ADDRESS: ${receipt.contractAddress}`);
 
         } catch (err) {
+            console.error('Transaction failed:', err);
             if (typeof err.message === 'string' && err.message.includes("user rejected")) {
                 this.showError('User rejected the request.');
             } else {

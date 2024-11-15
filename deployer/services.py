@@ -155,6 +155,9 @@ class CounterDeploymentService:
             await self._compile_contract()
             contract_data = self._get_contract_data()
             
+            
+            print(contract_data)
+            
             # Cache new contract data
             self._save_contract_data(contract_data)
             return {
