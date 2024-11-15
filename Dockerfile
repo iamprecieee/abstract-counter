@@ -58,9 +58,9 @@ COPY . .
 ENV PORT=8000
 
 # Start script
-RUN echo '#!/bin/bash \
-python manage.py migrate \
-python manage.py collectstatic --noinput \
+RUN echo '#!/bin/bash\n \
+python manage.py migrate\n \
+python manage.py collectstatic --noinput\n \
 gunicorn base.asgi:application -b 0.0.0.0:$PORT -c gunicorn.conf.py' > /app/start.sh && \
 chmod +x /app/start.sh
 
